@@ -1,7 +1,7 @@
 #########################################################
 # Quality Filtering scRNA-seq data
-# Created by Tarran Rupal and Niek de Klein
-# Adapted by Thais Crippa
+# Created by Niek de Klein
+# Adapted by Tarran Rupal and Thais Crippa
 # Last data modification: 08.Oct.2023
 #########################################################
 
@@ -17,7 +17,6 @@ if(sum(as.numeric(!packages %in% installed.packages())) != 0){
 } else {
   sapply(packages, require, character = T) 
 }
-
 
 library('Seurat')
 library(stringr)
@@ -68,10 +67,11 @@ mad_filt <- calculate_mad(seurat_list)
 ### Inspect elements
 violins_filt <- mad_figures(seurat_list, mad_filt, paste0('/figures/mad/'))
 
-# Filtering Manually by MAD (Median Allele Deviation)
+# Filtering Manually by MAD (Median Allele Deviation) -- Filtering outliers
 ### Filter is done by inspecting the lines of MAD and, by pool, 
 ### delimiting the MAD (1,1.5, 2, 3, 4) that is most close to the bottom 
-### of the round part of the violin plot
+### of the round part of the violin plot for nFeature and nCount
+### For MIT MAD will be done in the superior part of the violin plot
 
 ###########FILTERING ON NCOUNT (reads counts) ###########
 violins_filt$nCount_RNA
@@ -105,8 +105,7 @@ seurat_list$PBMC_MXP2 <- mad_function(seurat = seurat_list$PBMC_MXP2,
 seurat_list$PBMC_MXP3 <- mad_function(seurat = seurat_list$PBMC_MXP3,
                                       column = "nFeature_RNA", number_mad = 2.5)
 
-
-###########FILTERING ON PERCENT MITOCHONDRIAL ###########
+###########FILTERING ON MITOCHONDRIAL PERCENT ###########
 # We are going to remove only greatest numbers of mit perc.
 violins_filt$percent_mt
 
@@ -123,6 +122,7 @@ seurat_list$BCELL_MXP2 <- mad_function_mt(seurat = seurat_list$BCELL_MXP2,
 seurat_list$PBMC_MXP3 <- mad_function_mt(seurat = seurat_list$PBMC_MXP3,
                                          column = "percent_mt", number_mad = 3)
 
+## Create a seurat object filtered by the above parameters
 seurat_list_filt <- seurat_list 
 for(pool in names(seurat_list_filt)){
   seurat_list_filt[[pool]] <- subset(seurat_list_filt[[pool]],
