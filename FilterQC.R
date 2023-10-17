@@ -62,6 +62,13 @@ seurat_list <- readRDS('Jaguar_unclearData.RDS')
 # 1s STEP - FILTERING ON COUNTS GENES AND MITO READS
 #########################################################
 
+# The nFeature_RNA and nCount_RNA represents the number of genes detected in each cell and the total number 
+# of molecules (UMIs) detected within a cell respectively. While the low nFeature_RNA in a cell mean that it
+# may be dead/dying or it may represent an empty droplet, the high nCount_RNA and nFeature_RNA denotes that 
+# the cell may be a doublet or multiplet. This filtering along with mitochondrial reads is crucial 
+# pre-processing step, because, removing such outliers from these groups might also remove some of the 
+# doublets or dead/empty droplets.
+
 mad_filt <- calculate_mad(seurat_list)
 
 ### Inspect elements
@@ -74,6 +81,7 @@ violins_filt <- mad_figures(seurat_list, mad_filt, paste0('/figures/mad/'))
 ### For MIT MAD will be done in the superior part of the violin plot
 
 ###########FILTERING ON NCOUNT (reads counts) ###########
+### The below violin plots shows the number ofc counts reads after intial pre-processing
 violins_filt$nCount_RNA
 
 seurat_list$BCELL_MXP1 <- mad_function(seurat = seurat_list$BCELL_MXP1,
@@ -90,6 +98,7 @@ seurat_list$PBMC_MXP3 <- mad_function(seurat = seurat_list$PBMC_MXP3,
                                       column = "nCount_RNA", number_mad = 2)
 
 ###########FILTERING ON NFEATURE (RNA) ###########
+### The below violin plots shows the number of features after intial pre-processing
 violins_filt$nFeature_RNA
 
 seurat_list$BCELL_MXP1 <- mad_function(seurat = seurat_list$BCELL_MXP1,
@@ -106,7 +115,7 @@ seurat_list$PBMC_MXP3 <- mad_function(seurat = seurat_list$PBMC_MXP3,
                                       column = "nFeature_RNA", number_mad = 2.5)
 
 ###########FILTERING ON MITOCHONDRIAL PERCENT ###########
-# We are going to remove only greatest numbers of mit perc.
+### The below violin plots shows the number mitochondrial reads after intial pre-processing
 violins_filt$percent_mt
 
 seurat_list$BCELL_MXP1 <- mad_function_mt(seurat = seurat_list$BCELL_MXP1,
